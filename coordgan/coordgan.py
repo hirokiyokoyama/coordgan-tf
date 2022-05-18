@@ -123,14 +123,16 @@ class CoordGAN(tf.keras.Model):
             d_fake = self.discriminator(fake, training=True)
             gp_loss = tf.reduce_mean(tf.reduce_sum(tf.square(grad_gp), axis=[1,2,3]))
             gp_loss /= 2.
-            d_loss = self.adv_loss_fn(tf.ones_like(d_real), d_real) + self.adv_loss_fn(tf.zeros_like(d_fake), d_fake)
+            d_loss = self.adv_loss_fn(tf.ones_like(d_real), d_real)
+            d_loss += self.adv_loss_fn(tf.zeros_like(d_fake), d_fake)
 
             # patch discriminator (for structure swapping loss)
             pd_real, grad_gp = self.patch_discriminator(fake[0::2], fake[0::2], return_grad=True, training=True)
             pd_fake = self.patch_discriminator(fake[0::2], fake[1::2], training=True)
             pd_gp_loss = tf.reduce_mean(tf.reduce_sum(tf.square(grad_gp), axis=[1,2,3]))
             pd_gp_loss /= 2.
-            struct_loss = self.adv_loss_fn(tf.ones_like(pd_real), pd_real) + self.adv_loss_fn(tf.zeros_like(pd_fake), pd_fake)
+            struct_loss = self.adv_loss_fn(tf.ones_like(pd_real), pd_real)
+            struct_loss += self.adv_loss_fn(tf.zeros_like(pd_fake), pd_fake)
 
             loss = d_loss + gp_loss * self.r1_regularization_weight
             loss += (struct_loss + pd_gp_loss * self.patch_r1_regularization_weight) * self.structure_swap_loss_weight

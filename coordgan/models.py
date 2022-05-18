@@ -141,12 +141,18 @@ class ImageDiscriminator(tf.keras.Model):
         self.classifier = classifier
 
     def call(self, images, return_grad=False):
+        def _call(x):
+            x = self.classifier(x)
+            if x.shape.rank == 4:
+                x = tf.squeeze(x, [1,2])
+            return x
+                
         if not return_grad:
-            return self.classifier(images)
+            return _call(images)
 
         with tf.GradientTape() as tape:
             tape.watch(images)
-            d = self.classifier(images)
+            d = _call(images)
         grad = tape.gradient(d, images)
         return d, grad
         
@@ -188,27 +194,26 @@ class PatchDiscriminator(tf.keras.Model):
         N,P,H,W,C = tf.unstack(tf.shape(target))
         target = tf.reshape(target, [N*P,H,W,C])
 
-        def run_d(ref, x):
+        def _call(ref, x):
             ref = self.patch_encoder(ref)
             ref = tf.reshape(ref, [N,P,-1])
             ref = tf.reduce_mean(ref, axis=1)
-            #ref = tf.stop_gradient(ref)
 
             x = self.patch_encoder(x)
             x = tf.reshape(x, [N*P,-1])
             ref = tf.tile(ref[:,tf.newaxis,:], [1,P,1])
             ref = tf.reshape(ref, [N*P,-1])
             d = self.classifier(tf.concat([ref, x], axis=1))
-            d = tf.reshape(d, [N,P,1,1])
+            d = tf.reshape(d, [N,P,1])
             return d
 
         if not return_grad:
-            return run_d(reference, target)
+            return _call(reference, target)
 
         with tf.GradientTape() as tape:
             tape.watch(target)
             #tape.watch(reference)
-            d = run_d(reference, target)
+            d = _call(reference, target)
         grad = tape.gradient(d, target)
         #grad = tape.gradient(d, reference)
         return d, grad
