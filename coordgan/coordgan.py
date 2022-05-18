@@ -13,9 +13,7 @@ class CoordGAN(tf.keras.Model):
             r1_regularization_weight = 10.,
             patch_r1_regularization_weight = 1.,
             texture_code_dim = 512,
-            normalize_texture_code = True,
             structure_code_dim = 512,
-            normalize_structure_code = True,
             gan_loss_weight = 2.,
             texture_swap_loss_weight = 5.,
             structure_swap_loss_weight = 1.,
@@ -34,9 +32,7 @@ class CoordGAN(tf.keras.Model):
         self.lpips = lpips
 
         self.texture_code_dim = texture_code_dim
-        self.normalize_texture_code = normalize_texture_code
         self.structure_code_dim = structure_code_dim
-        self.normalize_structure_code = normalize_structure_code
 
         self.r1_regularization_weight = r1_regularization_weight
         self.patch_r1_regularization_weight = patch_r1_regularization_weight
@@ -64,14 +60,10 @@ class CoordGAN(tf.keras.Model):
 
     def generate_texture_code(self, batch_size):
         z = tf.random.normal([batch_size, self.texture_code_dim])
-        if self.normalize_texture_code:
-            z = tf.nn.l2_normalize(z, axis=-1)
         return z
 
     def generate_structure_code(self, batch_size):
         z = tf.random.normal([batch_size, self.structure_code_dim])
-        if self.normalize_structure_code:
-            z = tf.nn.l2_normalize(z, axis=-1)
         return z
     
     def generate_correspondence_map(self, v_struct, training=None):

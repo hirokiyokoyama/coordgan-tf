@@ -75,9 +75,7 @@ gan = coordgan.CoordGAN(
     r1_regularization_weight = 10.,
     patch_r1_regularization_weight = 1.,
     texture_code_dim = 512,
-    normalize_texture_code = False,
     structure_code_dim = 512,
-    normalize_structure_code = False,
     gan_loss_weight = 2.0,
     texture_swap_loss_weight = 5.,
     structure_swap_loss_weight = 1.,
@@ -89,6 +87,6 @@ gan.compile(
     g_optimizer = tf.keras.optimizers.Adam(0.0002, beta_1=0.0, beta_2=0.99))
 
 gan.fit(
-    coordgan.datasets.normalized_celeb_a(64),
+    coordgan.datasets.normalized_celeb_a(64).batch(16, drop_remainder=True),
     epochs = 50,
     callbacks = [coordgan.train.LossWeightScheduler()])

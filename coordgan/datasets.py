@@ -135,3 +135,9 @@ def normalized_celeb_a(size, split='train', **kwargs):
     dataset = tfds.load('celeb_a', split=split, **kwargs)
     dataset = dataset.map(lambda x: normalize_celeb_a(x, size)['image'] * 2. - 1.)
     return dataset
+
+def cropped_lfw(size=64, crop=32, split='train', **kwargs):
+    dataset = tfds.load('lfw', split=split, **kwargs)
+    dataset = dataset.map(lambda x: tf.cast(x['image'], tf.float32)/255.0 * 2. - 1.)
+    dataset = dataset.map(lambda x: tf.image.resize(x[crop:-crop,crop:-crop], [size,size]))
+    return dataset
