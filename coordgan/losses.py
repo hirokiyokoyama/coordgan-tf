@@ -17,6 +17,7 @@ def chamfer(coord1, coord2, n1=None, epsilon=1e-8):
 _lpips_vgg16 = None
 
 def lpips(x, y, size=[128,128]):
+    global _lpips_vgg16
     if _lpips_vgg16 is None:
         _lpips_vgg16 = _lpips.LPIPS_VGG16()
         _lpips_vgg16.load_pretrained_weights()

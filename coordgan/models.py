@@ -1,4 +1,6 @@
 import tensorflow as tf
+from . import layers
+from . import losses
 
 class ModulatedGenerator(tf.keras.Model):
     def __init__(self, channels, num_blocks,
@@ -63,7 +65,7 @@ class ModulatedGenerator(tf.keras.Model):
         x = tf.transpose(x, [0,3,1,2])
         coords = tf.transpose(coords, [0,3,1,2])
 
-        x = self.modulated_convs[0](enc, style)
+        x = self.modulated_convs[0](x, style)
         y = 0.
         for b in range(len(self.modulated_convs) // 2):
             conv1 = self.modulated_convs[b*2+1]
@@ -103,7 +105,7 @@ class CoordinateWarpingNetwork(tf.keras.Model):
         self.chamfer_sample_num = chamfer_sample_num
 
     def build(self, shape):
-        self.coord_conv = Conv2D(
+        self.coord_conv = layers.Conv2D(
             shape[-1], 1, 1, 'SAME', use_bias=False)
         self.built = True
 
