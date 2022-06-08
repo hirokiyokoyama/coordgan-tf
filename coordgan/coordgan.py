@@ -203,3 +203,19 @@ class CoordGAN(tf.keras.Model):
 
         d_losses.update(g_losses)
         return d_losses
+
+    def save_weights(self, filepath, overwrite=True, save_format=None, options=None):
+        self.patch_discriminator.save_weights(filepath+"/patch_discriminator/weights", overwrite, save_format, options)
+        self.discriminator.save_weights(filepath+"/discriminator/weights", overwrite, save_format, options)
+        self.mod_generator.save_weights(filepath+"/mod_generator/weights", overwrite, save_format, options)
+        self.texture_net.save_weights(filepath+"/texture_net/weights", overwrite, save_format, options)
+        self.structure_net.save_weights(filepath+"/structure_net/weights", overwrite, save_format, options)
+        self.warp_net.save_weights(filepath+"/warp_net/weights", overwrite, save_format, options)
+
+    def load_weights(self, filepath, by_name=False, skip_mismatch=False, options=None):
+        self.patch_discriminator.load_weights(filepath+"/patch_discriminator/weights", by_name, skip_mismatch, options)
+        self.discriminator.load_weights(filepath+"/discriminator/weights", by_name, skip_mismatch, options)
+        self.mod_generator.load_weights(filepath+"/mod_generator/weights", by_name, skip_mismatch, options)
+        self.texture_net.load_weights(filepath+"/texture_net/weights", by_name, skip_mismatch, options)
+        self.structure_net.load_weights(filepath+"/structure_net/weights", by_name, skip_mismatch, options)
+        self.warp_net.load_weights(filepath+"/warp_net/weights", by_name, skip_mismatch, options)
